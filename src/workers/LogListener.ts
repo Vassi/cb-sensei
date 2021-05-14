@@ -143,5 +143,4 @@ addOverlayListener('onZoneChangedEvent', (e) => {
 
 */
 
-console.log('Starting event listen.');
 startOverlayEvents();
