@@ -1,10 +1,13 @@
-import { PlayerDetail } from "./EventMap";
+import { OnGameActiveChangedEventArgs, OnGameExistsEventArgs, OnInCombatChangedEventArgs, PlayerDetail } from "./EventMap";
 
-export type LogEventType = 'SkillUsed' | 'EffectGained' | 'EffectLost';
-
-export type LogEvent = {
-  type: LogEventType,
-  args: SkillArgs | PlayerDetail
+export enum LogEventTypes {
+  SkillUsed = 'SkillUsed',
+  EffectGained = 'EffectGained',
+  EffectLost = 'EffectLost',
+  PlayerUpdate = 'PlayerUpdate',
+  InCombatUpdate = 'InCombatUpdate',
+  GameExistsUpdate = 'GameExistsUpdate',
+  GameActiveUpdate = 'GameUpdateUpdate',
 }
 
 export type SkillArgs = {
@@ -19,7 +22,19 @@ export type SkillArgs = {
   duration: number
 }
 
-export type GameStateArgs = {
-  gameExists: boolean,
-
-}
+export type LogEvent = {
+  type: LogEventTypes.SkillUsed | LogEventTypes.EffectGained | LogEventTypes.EffectLost,
+  args: SkillArgs,
+} | {
+  type: LogEventTypes.PlayerUpdate,
+  args: PlayerDetail,
+} | {
+  type: LogEventTypes.InCombatUpdate,
+  args: OnInCombatChangedEventArgs,
+} | {
+  type: LogEventTypes.GameActiveUpdate,
+  args: OnGameActiveChangedEventArgs,
+} | {
+  type: LogEventTypes.GameExistsUpdate,
+  args: OnGameExistsEventArgs
+};

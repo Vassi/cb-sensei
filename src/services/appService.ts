@@ -15,6 +15,10 @@ const jobConfigDefaults: JobConfig = {
 
 export default class AppService {
   overlayLocked = false;
+  gameExists = true;
+  gameActive = true;
+  inCombat = false;
+
   // TODO: use innoDB or some storage to back this.
   skillsConfigured = new Map<Job, JobConfig>();
 
@@ -28,5 +32,21 @@ export default class AppService {
 
   setJobConfig(job: Job, config: JobConfig) {
     this.skillsConfigured.set(job, config);
+  }
+
+  setLockedState(state: boolean) {
+    this.overlayLocked = state;
+  }
+
+  setGameExists(state: boolean) {
+    this.gameExists = state;
+  }
+
+  setGameActive(state: boolean) {
+    this.gameActive = state;
+  }
+
+  setCombatState(state: boolean) {
+    this.inCombat = state;
   }
 }

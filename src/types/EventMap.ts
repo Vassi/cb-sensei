@@ -57,16 +57,12 @@ export interface EventMap {
 
   'onGameExistsEvent': (ev: {
     type: 'onGameExistsEvent';
-    detail: {
-      exists: boolean;
-    };
+    detail: OnGameExistsEventArgs;
   }) => void;
 
   'onGameActiveChangedEvent': (ev: {
     type: 'onGameActiveChangedEvent';
-    detail: {
-      active: boolean;
-    };
+    detail: OnGameActiveChangedEventArgs;
   }) => void;
 
   'onLogEvent': (ev: OnLogEventArgs) => void;
@@ -78,7 +74,10 @@ export interface EventMap {
     };
   }) => void;
 
-  'onInCombatChangedEvent': (ev: OnInCompatChangedEventArgs) => void;
+  'onInCombatChangedEvent': (ev: {
+    type: 'onInCombatChangedEvent';
+    detail: OnInCombatChangedEventArgs
+  }) => void;
 
   'onZoneChangedEvent': (ev: {
     type: 'onZoneChangedEvent';
@@ -153,13 +152,19 @@ export type OnLogEventArgs = {
   };
 };
 
-export type OnInCompatChangedEventArgs = {
-  type: 'onInCombatChangedEvent';
-  detail: {
-    inACTCombat: boolean;
-    inGameCombat: boolean;
-  };
+export type OnInCombatChangedEventArgs = {
+  inACTCombat: boolean;
+  inGameCombat: boolean;
 };
+
+export type OnGameExistsEventArgs = {
+  exists: boolean;
+};
+
+export type OnGameActiveChangedEventArgs = {
+  active: boolean;
+};
+
 
 export type OnPlayerChangedEventArgs = {
   type: 'onPlayerChangedEvent';

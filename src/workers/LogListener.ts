@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import equal from 'fast-deep-equal';
 import { PlayerDetail } from 'types/EventMap';
-import { LogEvent } from 'types/LogEvents';
+import { LogEvent, LogEventTypes } from 'types/LogEvents';
 (self as any).$RefreshReg$ = () => { };
 (self as any).$RefreshSig$$ = () => () => { };
 
@@ -50,7 +50,7 @@ addOverlayListener('LogLine', (event) => {
     case '22': {
       const [, timestamp, casterId, casterName, effectId, effectName, targetId, targetName] = event.line
       const message: LogEvent = {
-        type: 'SkillUsed',
+        type: LogEventTypes.SkillUsed,
         args: {
           timestamp,
           timeUsed: new Date(timestamp),
@@ -71,7 +71,7 @@ addOverlayListener('LogLine', (event) => {
     case '26': {
       const [, timestamp, effectId, effectName, durationString, casterId, casterName, targetId, targetName] = event.line
       const message: LogEvent = {
-        type: 'EffectGained',
+        type: LogEventTypes.EffectGained,
         args: {
           timestamp,
           timeUsed: new Date(timestamp),
@@ -92,7 +92,7 @@ addOverlayListener('LogLine', (event) => {
     case '30': {
       const [, timestamp, effectId, effectName, durationString, casterId, casterName, targetId, targetName] = event.line
       const message: LogEvent = {
-        type: 'EffectLost',
+        type: LogEventTypes.EffectLost,
         args: {
           timestamp,
           timeUsed: new Date(timestamp),
@@ -120,19 +120,31 @@ addOverlayListener('onPlayerChangedEvent', (e) => {
     return;
   }
 
-  postMessage(e.detail);
+  postMessage({
+    type: LogEventTypes.PlayerUpdate,
+    args: e.detail
+  } as LogEvent);
 });
 
 addOverlayListener('onInCombatChangedEvent', (e) => {
-  postMessage(e);
+  postMessage({
+    type: LogEventTypes.InCombatUpdate,
+    args: e.detail
+  } as LogEvent);
 });
 
 addOverlayListener('onGameExistsEvent', (e) => {
-  postMessage(e);
+  postMessage({
+    type: LogEventTypes.GameExistsUpdate,
+    args: e.detail
+  } as LogEvent);
 });
 
 addOverlayListener('onGameActiveChangedEvent', (e) => {
-  postMessage(e);
+  postMessage({
+    type: LogEventTypes.GameActiveUpdate,
+    args: e.detail
+  } as LogEvent);
 });
 
 /* Possibly interesting triggers later on.

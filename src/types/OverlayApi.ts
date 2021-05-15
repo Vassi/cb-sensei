@@ -4,6 +4,7 @@ import { EventMap, EventType } from 'types/EventMap';
 declare global {
   function addOverlayListener<T extends EventType>(event: T, cb: EventMap[T]): void;
   function removeOverlayListener<T extends EventType>(event: T, cb: EventMap[T]): void;
+  function callOverlayHandler(payload: any): void;
   function startOverlayEvents(): void;
 
   // Web Worker API
