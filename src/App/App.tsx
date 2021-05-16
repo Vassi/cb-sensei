@@ -7,22 +7,22 @@ function App() {
   const app = useAppService();
   const player = usePlayerService();
 
-  if (!app.ready || !app.gameActive || !app.gameExists || !player.jobConfig) {
+  if (!app.overlayActive || !player.playerReady) {
     return null;
   }
 
   if (!app.overlayLocked) {
     return (<LockedInstructions></LockedInstructions>);
   }
-  console.log(player.jobConfig);
-  if (!player.jobConfig.skillsConfigured) {
-    return (<ConfigureSkills config={player.jobConfig} />);
+
+  if (!player.jobConfig!.skillsConfigured) {
+    return (<ConfigureSkills config={player.jobConfig!} />);
   }
 
 
   return (
     <div>
-      Rotation.
+      Rotation
     </div>
   );
 }

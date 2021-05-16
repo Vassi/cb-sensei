@@ -13,13 +13,8 @@ function ConfigureSkills({ config }: Props) {
   });
 
   const savePos = () => {
-    const saves: Promise<void>[] = [];
-    config.skills.forEach(tuple => {
-      saves.push(tuple.metadata.save());
-      Promise.all(saves).then(() => {
-        config.setSkillsConfigured(true);
-      });
-    });
+    config.setSkillsConfigured(true);
+    config.save();
   };
 
   return (

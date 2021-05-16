@@ -1,56 +1,36 @@
 import { makeAutoObservable } from 'mobx';
 import { Job } from 'types/Job';
-import Database, { SkillMetadata } from './database';
-import { IJobConfig, JobConfig } from './models/JobConfig';
+import { GlobalConfig } from './models/GlobalConfig';
+import { JobConfig } from './models/JobConfig';
 
 export default class AppService {
-  overlayLocked = false;
   gameExists = true;
   gameActive = true;
   inCombat = false;
   ready = false;
-
-  // TODO: use innoDB or some storage to back this.
-  skillsConfigured = new Map<Job, IJobConfig>();
+  config: GlobalConfig;
 
   constructor() {
     makeAutoObservable(this, undefined, { autoBind: true });
+
+    this.config = new GlobalConfig({ locked: false });
   }
 
   async getJobConfig(job: Job, playerId: number) {
-    const skillsLookup = Database.skills.where({ job: job }).toArray();
-    const metadataLookup = Database.skillMeta.where({ playerId, job }).toArray();
-    const [skills, metadata] = await Promise.all([skillsLookup, metadataLookup]);
+    return await JobConfig.get(playerId, job);
+  }
 
-    if (!skills.length) {
-      return null;
+  async initialize() {
+    const config = await GlobalConfig.get();
+
+    if (config) {
+      this.config = config;
     }
-
-    const skillMap = skills.map(skill => {
-      const meta = metadata.find(md => md.skillId === skill.id);
-      return {
-        skill,
-        metadata: meta ?? new SkillMetadata({
-          job: job,
-          playerId,
-          posX: 0,
-          posY: 0,
-          skillId: skill.id
-        })
-      }
-    });
-
-    const info = {
-      skillsConfigured: skills.length === metadata.length,
-      skills: skillMap,
-      speed: 500 // need to save and pull this from somewhere eventually
-    } as IJobConfig;
-
-    return new JobConfig(info);
   }
 
   setLockedState(state: boolean) {
-    this.overlayLocked = state;
+    this.config.locked = state;
+    this.config.save();
   }
 
   setGameExists(state: boolean) {
@@ -67,5 +47,13 @@ export default class AppService {
 
   setReadyState(state: boolean) {
     this.ready = state;
+  }
+
+  get overlayLocked() {
+    return this.config.locked;
+  }
+
+  get overlayActive() {
+    return this.gameExists && this.gameActive && this.ready;
   }
 }

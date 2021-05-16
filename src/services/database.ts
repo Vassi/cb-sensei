@@ -2,45 +2,25 @@ import Dexie from 'dexie';
 import { Skill } from './models/Skill';
 import skillCollection from './classes/skillCollection.json';
 import { Job } from 'types/Job';
-
-export class SkillMetadata implements ISkillMetadata {
-  id?: string;
-  playerId: number;
-  job: Job;
-  skillId: string;
-  posX: number;
-  posY: number;
-
-  constructor(args: ISkillMetadata) {
-    this.id = args.id;
-    this.playerId = args.playerId;
-    this.job = args.job;
-    this.skillId = args.skillId;
-    this.posX = args.posX;
-    this.posY = args.posY;
-  }
-
-  async save() {
-    await db.skillMeta.put(this);
-  }
-}
+import { GlobalConfig } from './models/GlobalConfig';
+import { JobConfig } from './models/JobConfig';
 
 class Database extends Dexie {
   skills: Dexie.Table<Skill, string>;
-  skillMeta: Dexie.Table<SkillMetadata, string>;
+  jobConfig: Dexie.Table<JobConfig, string>;
+  config: Dexie.Table<GlobalConfig, string>;
 
   constructor() {
     super('cb_sensei');
     this.version(1).stores({
       skills: 'id, name, *job, type',
-      skillMeta: '++id, [playerId+job]',
+      config: 'id',
+      jobConfig: '++id, [playerId+job]',
     });
 
     this.skills = this.table('skills');
-    this.skills.mapToClass(Skill);
-
-    this.skillMeta = this.table('skillMeta');
-    this.skillMeta.mapToClass(SkillMetadata);
+    this.jobConfig = this.table('jobConfig');
+    this.config = this.table('config');
   }
 }
 
@@ -53,14 +33,5 @@ db.on('populate', async () => {
     }
   }));
 });
-
-export interface ISkillMetadata {
-  id?: string;
-  playerId: number;
-  job: Job;
-  skillId: string;
-  posX: number;
-  posY: number;
-}
 
 export default db;

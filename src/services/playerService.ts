@@ -87,6 +87,10 @@ class PlayerStore {
   get jobDetail() {
     return this.playerInfo?.jobDetail;
   }
+
+  get playerReady() {
+    return this.jobConfig && this.level && this.level >= 80;
+  }
 }
 
 export default PlayerStore;
