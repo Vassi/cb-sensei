@@ -1,37 +1,52 @@
 import { makeAutoObservable } from 'mobx';
 import { Job } from 'types/Job';
-
-export type JobConfig = {
-  skillsConfigured: boolean,
-  speed: number,
-  level: number
-};
-
-const jobConfigDefaults: JobConfig = {
-  skillsConfigured: false,
-  speed: 300,
-  level: 80
-};
+import Database, { SkillMetadata } from './database';
+import { IJobConfig, JobConfig } from './models/JobConfig';
 
 export default class AppService {
   overlayLocked = false;
   gameExists = true;
   gameActive = true;
   inCombat = false;
+  ready = false;
 
   // TODO: use innoDB or some storage to back this.
-  skillsConfigured = new Map<Job, JobConfig>();
+  skillsConfigured = new Map<Job, IJobConfig>();
 
   constructor() {
     makeAutoObservable(this, undefined, { autoBind: true });
   }
 
-  getJobConfig(job: Job) {
-    return this.skillsConfigured.get(job) ?? jobConfigDefaults;
-  }
+  async getJobConfig(job: Job, playerId: number) {
+    const skillsLookup = Database.skills.where({ job: job }).toArray();
+    const metadataLookup = Database.skillMeta.where({ playerId, job }).toArray();
+    const [skills, metadata] = await Promise.all([skillsLookup, metadataLookup]);
 
-  setJobConfig(job: Job, config: JobConfig) {
-    this.skillsConfigured.set(job, config);
+    if (!skills.length) {
+      return null;
+    }
+
+    const skillMap = skills.map(skill => {
+      const meta = metadata.find(md => md.skillId === skill.id);
+      return {
+        skill,
+        metadata: meta ?? new SkillMetadata({
+          job: job,
+          playerId,
+          posX: 0,
+          posY: 0,
+          skillId: skill.id
+        })
+      }
+    });
+
+    const info = {
+      skillsConfigured: skills.length === metadata.length,
+      skills: skillMap,
+      speed: 500 // need to save and pull this from somewhere eventually
+    } as IJobConfig;
+
+    return new JobConfig(info);
   }
 
   setLockedState(state: boolean) {
@@ -48,5 +63,9 @@ export default class AppService {
 
   setCombatState(state: boolean) {
     this.inCombat = state;
+  }
+
+  setReadyState(state: boolean) {
+    this.ready = state;
   }
 }

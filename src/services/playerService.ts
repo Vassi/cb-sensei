@@ -1,16 +1,33 @@
 import { PlayerDetail } from 'types/EventMap';
-import { makeAutoObservable } from 'mobx';
+import { autorun, makeAutoObservable } from 'mobx';
 import AppService from './appService';
 import ModifierMap from './models/LevelModifiers';
+import { JobConfig } from './models/JobConfig';
 
 class PlayerStore {
   playerInfo: PlayerDetail | null = null;
   appService: AppService;
+  jobConfig?: JobConfig;
   modMap = new ModifierMap();
 
   constructor(appService: AppService) {
     makeAutoObservable(this, undefined, { autoBind: true });
     this.appService = appService;
+
+    autorun(() => {
+      if (!this.appService.ready) {
+        return;
+      }
+
+      this.appService.getJobConfig(this.playerInfo?.job ?? 'NONE', this.playerId ?? 0)
+        .then(config => {
+          if (config !== null) {
+            this.setJobConfig(config);
+          } else {
+            this.setJobConfig();
+          }
+        });
+    });
   }
 
   updatePlayerInfo(info: PlayerDetail) {
@@ -23,7 +40,8 @@ class PlayerStore {
       return 0;
     }
 
-    return Math.floor(130 * (this.jobConfig.speed - mods.sub) / mods.div + 1000);
+    const speed = this.jobConfig?.speed ?? 500;
+    return Math.floor(130 * (speed - mods.sub) / mods.div + 1000);
   }
 
   getGcd(actionDelay: number) {
@@ -42,8 +60,8 @@ class PlayerStore {
     return buffCombined / 100;
   }
 
-  get jobConfig() {
-    return this.appService.getJobConfig(this.playerInfo?.job ?? 'NONE');
+  setJobConfig(config?: JobConfig) {
+    this.jobConfig = config;
   }
 
   get level() {
@@ -60,6 +78,10 @@ class PlayerStore {
 
   get job() {
     return this.playerInfo?.job;
+  }
+
+  get playerId() {
+    return this.playerInfo?.id;
   }
 
   get jobDetail() {

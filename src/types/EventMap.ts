@@ -172,6 +172,7 @@ export type OnPlayerChangedEventArgs = {
 };
 
 export type PlayerDetail = {
+  id: number;
   name: string;
   job: Job;
   level: number;

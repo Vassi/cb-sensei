@@ -1,34 +1,28 @@
 import { observer } from 'mobx-react-lite';
-import { useAppService } from 'services';
-import { Skills, Openers } from 'services/classes/gnb';
-import { Skill } from 'services/models/Skill';
-import CurrentIndicator from 'shared/currentIndicator';
-import SkillIcon from 'shared/skillIcon';
+import { useAppService, usePlayerService } from 'services';
+import ConfigureSkills from './ConfigureSkills';
 import LockedInstructions from './LockedInstructions';
 
 function App() {
   const app = useAppService();
+  const player = usePlayerService();
 
-  if (!app.gameActive || !app.gameExists) {
+  if (!app.ready || !app.gameActive || !app.gameExists || !player.jobConfig) {
     return null;
   }
 
   if (!app.overlayLocked) {
     return (<LockedInstructions></LockedInstructions>);
   }
+  console.log(player.jobConfig);
+  if (!player.jobConfig.skillsConfigured) {
+    return (<ConfigureSkills config={player.jobConfig} />);
+  }
 
-  var gnbOpener = Openers[0];
-  var skillsById = new Map<string, Skill>();
-  Skills.forEach(sk => skillsById.set(sk.id, new Skill(sk)));
 
   return (
     <div>
-      <div style={{ position: 'absolute', top: 30, right: 'auto' }}>
-        <CurrentIndicator xPos={0} yPos={0} />
-      </div>
-      {gnbOpener.sequenceIds.map((id, index) => (
-        <SkillIcon key={index} skill={skillsById.get(id)!} draggable />
-      ))}
+      Rotation.
     </div>
   );
 }

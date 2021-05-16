@@ -1,7 +1,17 @@
 import { Job } from "types/Job";
 
-export type SkillType = 'Ability' | 'Weaponskill' | 'Spell';
-export type SkillResourceType = 'Mana' | 'Cartridge' | 'Buff';
+export enum SkillType {
+  Ability = 4,
+  Weaponskill = 3,
+  Spell = 2
+}
+
+// Will need to discover these on a job by job basis.
+export enum SkillResourceType {
+  Mana = 3,
+  Cartridge = 55,
+  MchOverheat = 69,
+}
 
 export class SkillResourceRequirement {
   value: number;
@@ -13,17 +23,7 @@ export class SkillResourceRequirement {
   }
 }
 
-export type SkillInfoArgs = {
-  name: string,
-  id: string,
-  job: Job[],
-  isOGCD?: boolean,
-  timer?: number,
-  cooldown?: number,
-  type?: SkillType,
-  requirements?: SkillResourceRequirement[],
-  stocks?: number,
-};
+export type SkillInfoArgs = Partial<SkillInfo>;
 
 export interface SkillInfo {
   name: string,
@@ -35,9 +35,12 @@ export interface SkillInfo {
   type: SkillType,
   requirements: SkillResourceRequirement[],
   stocks: number,
+  range: number,
+  preservesCombo: boolean,
+  combos: boolean,
+  comboSkillId?: string
 };
 
-const gcdTime = 2500;
 export class Skill implements SkillInfo {
   name: string;
   id: string;
@@ -48,17 +51,25 @@ export class Skill implements SkillInfo {
   type: SkillType;
   requirements: SkillResourceRequirement[];
   stocks: number;
+  range: number;
+  preservesCombo: boolean;
+  combos: boolean;
+  comboSkillId?: string;
 
-  constructor(args: SkillInfoArgs) {
+  constructor(args: SkillInfo) {
     this.name = args.name;
     this.id = args.id;
     this.job = args.job;
-    this.isOGCD = args.isOGCD ?? true;
-    this.timer = args.timer ?? gcdTime;
-    this.cooldown = args.cooldown ?? 0;
-    this.type = args.type ?? 'Weaponskill';
-    this.requirements = args.requirements ?? [];
-    this.stocks = args.stocks ?? 1;
+    this.isOGCD = args.isOGCD;
+    this.timer = args.timer;
+    this.cooldown = args.cooldown;
+    this.type = args.type;
+    this.requirements = args.requirements;
+    this.stocks = args.stocks;
+    this.range = args.range;
+    this.preservesCombo = args.preservesCombo;
+    this.combos = args.combos;
+    this.comboSkillId = args.comboSkillId;
   }
 
 }
