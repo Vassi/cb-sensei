@@ -1,15 +1,15 @@
+import { observer } from 'mobx-react-lite';
 import { createRef } from 'react';
 import Draggable, { DraggableData, DraggableEvent, DraggableEventHandler } from 'react-draggable';
 import { SkillTuple } from 'services/models/JobConfig';
 import styles from './skillIcon.module.scss';
 
 type SkillIconArgs = {
-  key?: any,
   draggable?: boolean,
   skillTuple: SkillTuple,
 }
 
-export default function SkillIcon({ skillTuple, draggable }: SkillIconArgs) {
+function SkillIcon({ skillTuple, draggable }: SkillIconArgs) {
   const imgSrc = process.env.PUBLIC_URL + '/Actions/' + skillTuple.skill.id + '.png';
   const nodeRef = createRef<HTMLDivElement>();
 
@@ -18,8 +18,9 @@ export default function SkillIcon({ skillTuple, draggable }: SkillIconArgs) {
     : { x: skillTuple.metadata.posX, y: skillTuple.metadata.posY };
 
   const updatePosition: DraggableEventHandler = (e: DraggableEvent, data: DraggableData) => {
-    skillTuple.metadata.posX = data.x;
-    skillTuple.metadata.posY = data.y;
+    const position = data.node.getBoundingClientRect()
+    skillTuple.metadata.posX = position.left;
+    skillTuple.metadata.posY = position.top;
   };
 
   return (
@@ -35,3 +36,5 @@ export default function SkillIcon({ skillTuple, draggable }: SkillIconArgs) {
     </Draggable>
   );
 };
+
+export default observer(SkillIcon);

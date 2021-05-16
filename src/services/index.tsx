@@ -30,3 +30,8 @@ export const useAppService = () => {
   const store = useServices()!.app;
   return store;
 }
+
+export const useRotationService = () => {
+  const store = useServices()!.rotation;
+  return store;
+}

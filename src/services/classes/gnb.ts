@@ -1,4 +1,4 @@
-import { ActionOpener } from 'services/models/Actions';
+import { IActionSequence } from 'services/models/Actions';
 
 export enum GnbSkills {
   KeenEdge = '3f09',
@@ -24,7 +24,7 @@ export enum GnbSkills {
 }
 
 
-export const Openers: ActionOpener[] = [{
+export const Openers: IActionSequence[] = [{
   name: 'Standard Opener',
   sequenceIds: [
     GnbSkills.KeenEdge,

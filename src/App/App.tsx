@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { useAppService, usePlayerService } from 'services';
 import ConfigureSkills from './ConfigureSkills';
 import LockedInstructions from './LockedInstructions';
+import CurrentIndicator from 'shared/CurrentIndicator';
 
 function App() {
   const app = useAppService();
@@ -19,10 +20,13 @@ function App() {
     return (<ConfigureSkills config={player.jobConfig!} />);
   }
 
+  const skills = player.jobConfig!.skills.map(sk => {
+    return (<CurrentIndicator key={sk.skill.id} skillTuple={sk} />)
+  });
 
   return (
     <div>
-      Rotation
+      {skills}
     </div>
   );
 }

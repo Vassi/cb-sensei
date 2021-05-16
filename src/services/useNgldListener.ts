@@ -22,10 +22,14 @@ async function connectToNgldListener(listener: worker, stores: AppStores) {
     // Connect to NGLD and events.
     const params = new URLSearchParams(window.location.search);
     const connectUrl = params.get('HOST');
-    listener.postMessage({ connect: true, connectUrl });
+    const debug = !!params.get('debug');
+    if (debug) {
+      (window as any).stores = stores;
+    }
 
+    listener.postMessage({ connect: true, connectUrl });
     listener.addEventListener('message', (e: MessageEvent<LogEvent>) => {
-      if ((window as any).logEvents) {
+      if (debug) {
         // Set this var through dev-tools in ACT
         console.log(e.data);
       }
